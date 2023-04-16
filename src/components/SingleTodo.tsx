@@ -2,13 +2,15 @@ import React, { useEffect, useRef, useState } from 'react'
 import {AiFillEdit,AiFillDelete} from 'react-icons/ai'
 import {MdDone} from 'react-icons/md'
 import { Todo } from './model'
+import { Draggable } from 'react-beautiful-dnd'
 // import TodoList from './TodoList'
 type Props ={
     todo:Todo;
     todos:Todo[];
     setTodos:React.Dispatch<React.SetStateAction<Todo[]>>;
+    index:number;
 }
-const SingleTodo:React.FC<Props> = ({todo,setTodos,todos,}) => {
+const SingleTodo:React.FC<Props> = ({todo,setTodos,todos,index}) => {
     const [edit,setEdit] = useState<boolean>(false);
     const [editTodo,setEditTodo] = useState<string>(todo.todo);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -28,7 +30,10 @@ const SingleTodo:React.FC<Props> = ({todo,setTodos,todos,}) => {
         inputRef.current?.focus();
     },[edit]);
   return (
-    <form className='todos__single' onSubmit={(e)=>handleEdit(e , todo.id)}>
+    <Draggable draggableId={todo.id.toString()} index={index}>
+        {
+            (provided,snapshot)=>(
+                <form className={`todos__single ${snapshot.isDragging?'drag':''}`} onSubmit={(e)=>handleEdit(e , todo.id)} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
         {
             edit?(
                 <input ref={inputRef} value={editTodo} className='todos__single--text' onChange={(e)=>setEditTodo(e.target.value)} />
@@ -41,7 +46,7 @@ const SingleTodo:React.FC<Props> = ({todo,setTodos,todos,}) => {
                     {todo.todo}
                 </span>
                     )
-        }
+                }
         
         
         <div>
@@ -56,6 +61,10 @@ const SingleTodo:React.FC<Props> = ({todo,setTodos,todos,}) => {
             </span>
         </div>
     </form>
+            )
+        }
+    
+                </Draggable>
   )
 }
 
